@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Link, router, useLocalSearchParams } from 'expo-router';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -88,7 +88,6 @@ export default function MinhasDenunciasScreen() {
       {feedback && <Text style={styles.success}>{feedback}</Text>}
 
       <ScrollView contentContainerStyle={styles.list}>
-        {loading && <ActivityIndicator color={theme.colors.primaryLight} />}
         {!loading && filteredDenuncias.length === 0 && <Text style={styles.empty}>Nenhuma denúncia encontrada.</Text>}
         {filteredDenuncias.map((item) => (
           <View key={item.id} style={styles.card}>
