@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Button } from '../../components/Button';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -48,7 +48,6 @@ export default function CitizenHomeScreen() {
 
         <Text style={styles.sectionTitle}>Minhas denúncias</Text>
 
-        {loading && <ActivityIndicator color={theme.colors.primaryLight} />}
         {!loading && denuncias.length === 0 && <Text style={styles.empty}>Você ainda não cadastrou denúncias.</Text>}
         {denuncias.map((item) => (
           <Link key={item.id} href={`/(citizen)/denuncia/${item.id}`} asChild>
