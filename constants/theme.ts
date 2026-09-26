@@ -11,6 +11,8 @@ export const theme = {
     warning: '#F59E0B',
     error: '#D32F2F',
     info: '#1976D2',
+    inputText: '#172033',
+    placeholder: '#98A2B3',
   },
   spacing: {
     xs: 8,
@@ -19,6 +21,7 @@ export const theme = {
     lg: 20,
     xl: 24,
     xxl: 32,
+    screenTop: 24,
   },
   radii: {
     sm: 8,

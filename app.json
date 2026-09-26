@@ -28,13 +28,13 @@
     },
     "plugins": [
       "expo-router",
-      "@maplibre/maplibre-react-native",
       [
         "expo-location",
         {
           "locationWhenInUsePermission": "Permita que o Denúncia Urbana use sua localização para identificar o local da ocorrência."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "scheme": "denuncia-urbana",
     "extra": {

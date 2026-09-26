@@ -1,13 +1,18 @@
 import { useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { StatusBadge } from '../../../components/StatusBadge';
-import { mockDenuncias } from '../../../services/api';
+import { buscarDenuncia } from '../../../services/denuncias';
+import { Denuncia } from '../../../types';
 import { theme } from '../../../constants/theme';
 
 export default function DenunciaDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const denuncia = mockDenuncias.find((item) => item.id === id) ?? mockDenuncias[0];
+  const [denuncia, setDenuncia] = React.useState<Denuncia | null>(null);
+  React.useEffect(() => { if (id) buscarDenuncia(id).then(setDenuncia).catch(console.error); }, [id]);
+
+  if (!denuncia) return <View style={styles.loading}><ActivityIndicator size="large" color={theme.colors.primaryLight} /></View>;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -29,7 +34,12 @@ export default function DenunciaDetailScreen() {
         <Text style={styles.value}>{denuncia.descricao}</Text>
 
         <Text style={styles.label}>Localização</Text>
-        <Text style={styles.value}>{denuncia.localizacao.endereco}</Text>
+        <Text style={styles.label}>Registrada em</Text>
+        <Text style={styles.value}>{new Date(denuncia.data).toLocaleString('pt-BR')}</Text>
+        <Text style={styles.label}>Data e hora da ocorrência</Text>
+        <Text style={styles.value}>{new Date(denuncia.dataOcorrencia ?? denuncia.data).toLocaleString('pt-BR')}</Text>
+        <Text style={styles.label}>Localização</Text>
+        <Text style={styles.value}>{denuncia.localizacao?.endereco ?? 'Não informada'}</Text>
       </View>
     </ScrollView>
   );
@@ -42,6 +52,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingTop: theme.spacing.screenTop,
   },
   header: {
     flexDirection: 'row',
@@ -71,5 +82,10 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginTop: 4,
     fontSize: 16,
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
