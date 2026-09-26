@@ -1,13 +1,34 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Button } from '../../components/Button';
 import { StatusBadge } from '../../components/StatusBadge';
-import { mockDenuncias } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { observarDenunciasDoUsuario } from '../../services/denuncias';
+import { Denuncia } from '../../types';
 import { theme } from '../../constants/theme';
 
 export default function CitizenHomeScreen() {
-  const denuncias = mockDenuncias;
+  const { user } = useAuth();
+  const [denuncias, setDenuncias] = React.useState<Denuncia[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!user) return;
+    const unsubscribe = observarDenunciasDoUsuario(
+      user.uid,
+      (nextDenuncias) => {
+        setDenuncias(nextDenuncias);
+        setLoading(false);
+      },
+      (error) => {
+        console.error(error);
+        setLoading(false);
+      },
+    );
+    return unsubscribe;
+  }, [user]);
 
   return (
     <View style={styles.container}>
@@ -18,7 +39,7 @@ export default function CitizenHomeScreen() {
         </View>
 
         <View style={styles.heroCard}>
-          <Text style={styles.heroLabel}>Olá, Maria</Text>
+          <Text style={styles.heroLabel}>Olá, {user?.displayName ?? 'cidadão'}</Text>
           <Text style={styles.heroText}>Sua cidade melhor começa com uma denúncia bem informada.</Text>
           <Link href="/(citizen)/denuncia/localizacao" asChild>
             <Button title="Nova denúncia" style={styles.button} />
@@ -27,6 +48,8 @@ export default function CitizenHomeScreen() {
 
         <Text style={styles.sectionTitle}>Minhas denúncias</Text>
 
+        {loading && <ActivityIndicator color={theme.colors.primaryLight} />}
+        {!loading && denuncias.length === 0 && <Text style={styles.empty}>Você ainda não cadastrou denúncias.</Text>}
         {denuncias.map((item) => (
           <Link key={item.id} href={`/(citizen)/denuncia/${item.id}`} asChild>
             <View style={styles.card}>
@@ -35,7 +58,7 @@ export default function CitizenHomeScreen() {
                 <StatusBadge status={item.status} />
               </View>
               <Text style={styles.cardLocation}>{item.localizacao.endereco}</Text>
-              <Text style={styles.cardDate}>{new Date(item.data).toLocaleDateString('pt-BR')}</Text>
+              <Text style={styles.cardDate}>Ocorrência em: {new Date(item.dataOcorrencia ?? item.data).toLocaleString('pt-BR')}</Text>
             </View>
           </Link>
         ))}
@@ -51,6 +74,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingTop: theme.spacing.screenTop,
     paddingBottom: 32,
   },
   headerRow: {
@@ -118,5 +142,9 @@ const styles = StyleSheet.create({
   cardDate: {
     color: theme.colors.textSecondary,
     fontSize: 12,
+  },
+  empty: {
+    color: theme.colors.textSecondary,
+    marginBottom: 12,
   },
 });

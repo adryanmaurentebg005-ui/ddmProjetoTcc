@@ -52,6 +52,7 @@ export interface Denuncia {
   data: string;
   usuarioId: string;
   historico: HistoricoStatus[];
+  dataOcorrencia?: string;
 }
 
 export interface Notificacao {

@@ -28,6 +28,7 @@ export default function CitizenLayout() {
       <Tabs.Screen
         name="mapa"
         options={{
+          href: null,
           title: 'Mapa',
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="map-outline" size={size} color={color} />,
         }}
@@ -35,6 +36,7 @@ export default function CitizenLayout() {
       <Tabs.Screen
         name="notificacoes"
         options={{
+          href: null,
           title: 'Notificações',
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="bell-outline" size={size} color={color} />,
         }}
@@ -46,6 +48,9 @@ export default function CitizenLayout() {
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="account-circle-outline" size={size} color={color} />,
         }}
       />
+      <Tabs.Screen name="denuncia/nova" options={{ href: null }} />
+      <Tabs.Screen name="denuncia/localizacao" options={{ href: null }} />
+      <Tabs.Screen name="denuncia/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

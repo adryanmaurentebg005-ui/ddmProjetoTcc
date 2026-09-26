@@ -1,17 +1,31 @@
 import { Link, router } from 'expo-router';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Button } from '../../components/Button';
 import { theme } from '../../constants/theme';
-import { loginMock } from '../../services/api';
+import { getAuthErrorMessage, useAuth } from '../../contexts/AuthContext';
 
 export default function LoginScreen() {
+  const { signIn } = useAuth();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
   const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setError('Preencha e-mail e senha.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
     try {
-      await loginMock('maria@teste.com', '123456');
-      router.replace('/(citizen)/home');
+      await signIn(email, password);
     } catch (error) {
-      console.log(error);
+      setError(getAuthErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,12 +37,14 @@ export default function LoginScreen() {
         <Text style={styles.subtitle}>Entre com sua conta para acompanhar denúncias.</Text>
 
         <Text style={styles.label}>E-mail</Text>
-        <TextInput style={styles.input} value="maria@teste.com" autoCapitalize="none" />
+        <TextInput style={styles.input} placeholder="seu@email.com" placeholderTextColor={theme.colors.placeholder} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
 
         <Text style={styles.label}>Senha</Text>
-        <TextInput style={styles.input} value="123456" secureTextEntry />
+        <TextInput style={styles.input} placeholder="Sua senha" placeholderTextColor={theme.colors.placeholder} value={password} onChangeText={setPassword} secureTextEntry />
 
-        <Button title="Entrar" onPress={handleLogin} />
+        {error && <Text style={styles.error}>{error}</Text>}
+        <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} disabled={loading} />
+        {loading && <ActivityIndicator style={styles.loader} color={theme.colors.primaryLight} />}
 
         <View style={styles.row}>
           <Text style={styles.helperText}>Não tem conta?</Text>
@@ -78,6 +94,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     fontSize: 16,
     backgroundColor: '#fff',
+    color: theme.colors.inputText,
   },
   row: {
     marginTop: 18,
@@ -91,5 +108,13 @@ const styles = StyleSheet.create({
   link: {
     color: theme.colors.primaryLight,
     fontWeight: '700',
+  },
+  error: {
+    color: theme.colors.error,
+    alignSelf: 'stretch',
+    marginBottom: 12,
+  },
+  loader: {
+    marginTop: 10,
   },
 });
